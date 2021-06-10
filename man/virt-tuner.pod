@@ -1,0 +1,39 @@
+=encoding utf8
+
+=head1 NAME
+
+virt-tuner - VM definition tuner
+
+=head1 SYNOPSIS
+
+B<virt-tuner> [OPTIONS]
+
+=head1 DESCRIPTION
+
+B<virt-tuner> is a tool providing an easy way to tune the definition of a domain
+to enhance performances for special use cases.
+
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-d>, B<--debug>
+
+Show debugging output messages.
+
+=item B<-h>, B<--help>
+
+Display command line help summary.
+
+=item B<--version>
+
+Show B<virt-tuner>'s version number and exit.
+
+=back
+
+=head1 AUTHORS
+
+Written by Cedric Bosdonnat
+
+=cut
