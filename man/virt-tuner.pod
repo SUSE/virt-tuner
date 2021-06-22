@@ -6,17 +6,25 @@ virt-tuner - VM definition tuner
 
 =head1 SYNOPSIS
 
-B<virt-tuner> [OPTIONS]
+B<virt-tuner> [OPTIONS] INPUT
 
 =head1 DESCRIPTION
 
 B<virt-tuner> is a tool providing an easy way to tune the definition of a domain
 to enhance performances for special use cases.
 
+To get the list of tuning templates available, run B<virt-tuner> without any B<--template> parameter.
+
+B<INPUT> is the input XML definition file or B<-> to read it from the standard input.
 
 =head1 OPTIONS
 
 =over 4
+
+=item B<--template TEMPLATE>
+
+The template to apply for the tuning.
+To get the list of all templates, call B<virt-tuner> without this parameter
 
 =item B<-d>, B<--debug>
 

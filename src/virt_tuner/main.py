@@ -25,9 +25,11 @@ and calls corresponding methods on appropriate object.
 import argparse
 import gettext
 import logging
+import os.path
 import sys
 
 import virt_tuner
+import virt_tuner.xmlutil as xmlutil
 
 gettext.bindtextdomain("virt-tuner", "/usr/share/locale")
 gettext.textdomain("virt-tuner")
@@ -62,9 +64,6 @@ def set_logging_conf(loglevel=None):
     module_logger.setLevel(loglevel or logging.INFO)
 
 
-<<<<<<< HEAD
-def main():
-=======
 def list_templates():
     """
     Print the list of templates to stdout
@@ -75,13 +74,22 @@ def list_templates():
 
 
 def main(argv):
->>>>>>> f66a4f5 (fixup! Initial commit)
     """
     CLI tool entry point
     """
     parser = argparse.ArgumentParser(
         description=_("VM definition tuner"),
         conflict_handler="resolve",
+    )
+    parser.add_argument(
+        "--template",
+        help=_(
+            "the template to apply to tune the virtual machine. If not provided, lists available templates."
+        ),
+    )
+    parser.add_argument(
+        "input",
+        help="path to virtual machine XML to tune or '-' to read it from standard input",
     )
 
     parser.add_argument(
@@ -104,6 +112,25 @@ def main(argv):
 
         # Configure logging lovel/format
         set_logging_conf(args.loglevel)
+
+        if not args.template or args.template not in virt_tuner.templates:
+            if args.template:
+                logging.error(_("Unknown template: " + args.template))
+            list_templates()
+            sys.exit(1)
+
+        # Update the VM here!
+        if args.input == "-":
+            definition = sys.stdin.read()
+        elif os.path.isfile(args.input):
+            with open(args.input, "r") as file_handle:
+                definition = file_handle.read()
+        else:
+            logging.error(_("Input path has to point to a readable file"))
+            sys.exit(1)
+
+        new_config = virt_tuner.templates[args.template].function()
+        print(xmlutil.merge_config(definition, new_config).decode())
 
         sys.exit(0)
     except KeyboardInterrupt:
