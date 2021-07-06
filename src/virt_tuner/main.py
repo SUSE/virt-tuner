@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # Authors: Cedric Bosdonnat <cbosdonnat@suse.com>
 #
@@ -18,8 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Main executable file which process input arguments
-and calls corresponding methods on appropriate object.
+Main entry point of the CLI tool
 """
 
 import argparse
@@ -68,28 +66,22 @@ def list_templates():
     """
     Print the list of templates to stdout
     """
-    print(_("Templates:\n"))
+    buf = _("templates:\n")
     for name, template in virt_tuner.templates.items():
-        print(f" - {name}: {template.description}")
+        buf += f" - {name}: {template.description}\n"
+    return buf
 
 
-def main(argv):
+def cli(argv):
     """
-    CLI tool entry point
+    CLI tool main function.
+    Returns the exit code and takes parameters for better testability.
     """
     parser = argparse.ArgumentParser(
         description=_("VM definition tuner"),
         conflict_handler="resolve",
-    )
-    parser.add_argument(
-        "--template",
-        help=_(
-            "the template to apply to tune the virtual machine. If not provided, lists available templates."
-        ),
-    )
-    parser.add_argument(
-        "input",
-        help="path to virtual machine XML to tune or '-' to read it from standard input",
+        epilog=list_templates(),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
     parser.add_argument(
@@ -107,6 +99,18 @@ def main(argv):
         const=logging.DEBUG,
     )
 
+    parser.add_argument(
+        "--template",
+        required=True,
+        choices=virt_tuner.templates.keys(),
+        help=_("the template to apply to tune the virtual machine."),
+    )
+    parser.add_argument(
+        "input",
+        metavar="INPUT_PATH",
+        help="path to virtual machine XML to tune or '-' to read it from standard input",
+    )
+
     try:
         args = parser.parse_args(argv)
 
@@ -116,8 +120,8 @@ def main(argv):
         if not args.template or args.template not in virt_tuner.templates:
             if args.template:
                 logging.error(_("Unknown template: " + args.template))
-            list_templates()
-            sys.exit(1)
+            print(list_templates())
+            return 1
 
         # Update the VM here!
         if args.input == "-":
@@ -127,18 +131,21 @@ def main(argv):
                 definition = file_handle.read()
         else:
             logging.error(_("Input path has to point to a readable file"))
-            sys.exit(1)
+            return 1
 
         new_config = virt_tuner.templates[args.template].function()
         print(xmlutil.merge_config(definition, new_config).decode())
 
-        sys.exit(0)
+        return 0
     except KeyboardInterrupt:
-        sys.exit(0)
+        return 0
     except ValueError as err:
         logging.error(err)
-        sys.exit(1)
+        return 1
 
 
-if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:]))
+def main():
+    """
+    CLI wrapper handling the arguments and exit from sys
+    """
+    sys.exit(cli(sys.argv[1:]))
