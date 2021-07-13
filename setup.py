@@ -202,7 +202,7 @@ setuptools.setup(
     description="VM definition tuner",
     license="GPLv3+",
     long_description=read("README.md"),
-    url="https://github.com/cbosdo/virt-tuner",
+    url="https://github.com/SUSE/virt-tuner",
     keywords="virtualization",
     package_dir={"": "src"},
     packages=setuptools.find_packages("src"),
