@@ -21,22 +21,12 @@ Main entry point of the CLI tool
 """
 
 import argparse
-import gettext
 import logging
 import os.path
 import sys
 
 import virt_tuner
 import virt_tuner.xmlutil as xmlutil
-
-gettext.bindtextdomain("virt-tuner", "/usr/share/locale")
-gettext.textdomain("virt-tuner")
-try:
-    gettext.install("virt-tuner", localedir="/usr/share/locale")
-except IOError:
-    import builtins
-
-    builtins.__dict__["_"] = str
 
 logger = logging.getLogger("virt_tuner.main")
 

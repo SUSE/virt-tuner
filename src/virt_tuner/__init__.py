@@ -21,9 +21,19 @@ Utility functions to generate tuned configuration virtual machines
 """
 
 from collections import namedtuple
+import gettext
 import logging
 import itertools
 import virt_tuner.virt
+
+gettext.bindtextdomain("virt-tuner", "/usr/share/locale")
+gettext.textdomain("virt-tuner")
+try:
+    gettext.install("virt-tuner", localedir="/usr/share/locale")
+except IOError:
+    import builtins
+
+    builtins.__dict__["_"] = str
 
 log = logging.getLogger(__name__)
 
@@ -108,7 +118,7 @@ def single():
 
 templates = {
     "single": Template(
-        "Single virtual machine using almost all the host resources",
+        _("Single virtual machine using almost all the host resources"),
         single,
         [],
     ),
