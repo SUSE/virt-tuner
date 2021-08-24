@@ -14,7 +14,7 @@ To test changes without installing the package in your machine,
 use the run script. For example to run virt-tuner, use a command
 like the following one:
 
-    ./run src/virt_tuner/main.py --help
+    PYTHONPATH=$PWD/src python3 -m virt_tuner --help
 
 The following commands will be useful for anyone writing patches:
 
