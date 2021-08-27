@@ -61,8 +61,18 @@ def single():
         }.pop(),
     }
 
-    # Round to multiple of 1GiB due to enforced 1GiB hugepages
-    vm_memory = int(virt_tuner.virt.host_memory() * 0.9 / 1024) * 1024
+    # Compute the amount of 1GiB pages per cell.
+    # We want an even number of pages on each cell
+    # and at least 9% of the total memory amount for the host
+    cells_mem = [cell.memory for cell in cells]
+    cells_pages = [int(mem / (1024 ** 2)) for mem in cells_mem]
+    cell_pages_max = min(cells_pages)
+
+    pages_per_cell = int(sum(cells_mem) * 0.91 / (1024 ** 2) / len(cells_mem))
+    if cell_pages_max * len(cells_mem) * 1024 ** 2 / sum(cells_mem) <= 0.91:
+        pages_per_cell = cell_pages_max
+
+    vm_memory = pages_per_cell * len(cells)
 
     return {
         "cpu": {
@@ -84,7 +94,7 @@ def single():
             "numa": {
                 c.id: {
                     "cpus": ",".join([str(cpu["id"]) for cpu in c.cpus]),
-                    "memory": str(int(vm_memory / len(cells))) + " MiB",
+                    "memory": str(pages_per_cell) + " GiB",
                     "distances": c.distances,
                 }
                 for c in cells
@@ -100,8 +110,8 @@ def single():
             },
         },
         "mem": {
-            "boot": str(vm_memory) + " MiB",
-            "current": str(vm_memory) + " MiB",
+            "boot": str(vm_memory) + " GiB",
+            "current": str(vm_memory) + " GiB",
             "nosharepages": True,
             "hugepages": [{"size": "1 G"}],
         },
