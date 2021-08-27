@@ -37,7 +37,7 @@ except IOError:
 
 log = logging.getLogger(__name__)
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 
 Template = namedtuple("Template", ["description", "function", "parameters"])
