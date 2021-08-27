@@ -108,10 +108,10 @@ def merge_cpu_config(doc, config):
         numa_path = ["cpu", "numa", f"cell[@id='{cell_id}']"]
         set_attribute(doc, numa_path, "cpus", numa.get("cpus"))
         memory = numa.get("memory")
-        if memory and memory.endswith(" MiB"):
-            memory = memory.split(" ")[0]
+        if memory:
+            (memory, unit) = memory.split(" ")
             set_attribute(doc, numa_path, "memory", memory)
-            set_attribute(doc, numa_path, "unit", "MiB")
+            set_attribute(doc, numa_path, "unit", unit)
 
         for sibling_id, distance in numa.get("distances", {}).items():
             set_attribute(
