@@ -172,29 +172,10 @@ def test_host_topology():
         "core_id": "0",
         "siblings": "0,48",
     }
-    assert topology[1].memory == "32982940 KiB"
+    assert topology[1].memory == 32982940
     assert topology[0].distances == {0: 10, 1: 21}
     assert topology[0].pages == [
         {"size": "4 KiB", "count": 8161648},
         {"size": "2048 KiB", "count": 0},
         {"size": "1048576 KiB", "count": 0},
     ]
-
-
-def test_host_memory():
-    """
-    test the virt.host_memory() function
-    """
-    libvirt_mock = MagicMock()
-    libvirt_mock.open.return_value.getInfo.return_value = [
-        "x86_64",
-        31944,
-        8,
-        2700,
-        1,
-        1,
-        4,
-        2,
-    ]
-    virt_tuner.virt.libvirt = libvirt_mock
-    assert virt_tuner.virt.host_memory() == 31944

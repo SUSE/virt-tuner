@@ -43,9 +43,7 @@ def host_topology():
             Cell(
                 int(node.get("id")),
                 [cpu.attrib for cpu in node.findall("cpus/cpu")],
-                "{} {}".format(
-                    node.find("memory").text, node.find("memory").get("unit")
-                ),
+                int(node.find("memory").text),  # libvirt always outputs memory in KiB
                 {
                     int(dist.get("id")): int(dist.get("value"))
                     for dist in node.findall("distances/sibling")
@@ -66,19 +64,3 @@ def host_topology():
         cnx.close()
 
     return cells
-
-
-def host_memory():
-    """
-    The amount of memory of the virtual host in MiB
-    """
-    cnx = libvirt.open()
-    mem = 0
-    try:
-        info = cnx.getInfo()
-        mem = info[1]
-    except libvirt.libvirtError as err:
-        log.error(err)
-    finally:
-        cnx.close()
-    return mem
