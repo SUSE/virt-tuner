@@ -51,7 +51,7 @@ def single():
     cpus = [cell.cpus for cell in cells]
     cpus = [cpu for sublist in cpus for cpu in sublist]
 
-    key_fn = lambda c: "{}-{}".format(c["socket_id"], c["core_id"])
+    key_fn = lambda c: "{:0>5}{:0>5}".format(c["socket_id"], c["core_id"])
 
     # Sort the cpus to have the consecutive IDs for the siblings:
     # QEMU needs this trick to think the two virtual cpus are located on the same core.
