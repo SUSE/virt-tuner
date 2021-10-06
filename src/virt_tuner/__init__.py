@@ -37,7 +37,7 @@ except IOError:
 
 log = logging.getLogger(__name__)
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 
 Template = namedtuple("Template", ["description", "function", "parameters"])
@@ -52,6 +52,12 @@ def single():
     cpus = [cpu for sublist in cpus for cpu in sublist]
 
     key_fn = lambda c: "{}-{}".format(c["socket_id"], c["core_id"])
+
+    # Sort the cpus to have the consecutive IDs for the siblings:
+    # QEMU needs this trick to think the two virtual cpus are located on the same core.
+    cpus = sorted(cpus, key=key_fn)
+    for id, cpu in enumerate(cpus):
+        cpu['id'] = id
 
     cpu_topology = {
         "sockets": len({c["socket_id"] for c in cpus}),
@@ -93,7 +99,7 @@ def single():
             },
             "numa": {
                 c.id: {
-                    "cpus": ",".join([str(cpu["id"]) for cpu in c.cpus]),
+                    "cpus": ",".join([str(cpu["id"]) for cpu in sorted(c.cpus, key=lambda c: c["id"])]),
                     "memory": str(pages_per_cell) + " GiB",
                     "distances": c.distances,
                 }
